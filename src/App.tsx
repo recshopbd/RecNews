@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'motion/react';
 export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'admin'
   const [session, setSession] = useState<any>(null);
+  const [selectedPost, setSelectedPost] = useState<any>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -33,7 +34,7 @@ export default function App() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="text-3xl font-display font-bold tracking-tighter cursor-pointer" 
-            onClick={() => setView('home')}
+            onClick={() => { setView('home'); setSelectedPost(null); }}
           >
             RecNews<span className="text-electric">.</span>
           </motion.h1>
@@ -42,7 +43,7 @@ export default function App() {
             animate={{ opacity: 1, x: 0 }}
             className="flex gap-8 items-center font-mono text-xs uppercase tracking-widest"
           >
-            <button onClick={() => setView('home')} className={`transition-colors ${view === 'home' ? 'text-electric font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}>Home</button>
+            <button onClick={() => { setView('home'); setSelectedPost(null); }} className={`transition-colors ${view === 'home' ? 'text-electric font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}>Home</button>
             <button onClick={() => setView('admin')} className={`transition-colors ${view === 'admin' ? 'text-electric font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}>Admin</button>
             {session && (
               <button onClick={() => supabase.auth.signOut()} className="text-red-500 hover:text-red-700 transition-colors">Sign Out</button>
@@ -52,9 +53,13 @@ export default function App() {
       </nav>
 
       <AnimatePresence mode="wait">
-        {view === 'home' ? (
+        {view === 'home' && !selectedPost ? (
           <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-            <HomePage />
+            <HomePage onReadPost={setSelectedPost} />
+          </motion.div>
+        ) : view === 'home' && selectedPost ? (
+          <motion.div key="post" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+            <PostPage post={selectedPost} onBack={() => setSelectedPost(null)} />
           </motion.div>
         ) : (
           <motion.div key="admin" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
@@ -66,7 +71,7 @@ export default function App() {
   );
 }
 
-function HomePage() {
+function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -148,17 +153,15 @@ function HomePage() {
                 <p className="text-lg text-zinc-600 mb-6 leading-relaxed max-w-3xl">
                   {post.description}
                 </p>
-                {post.source_link && (
-                  <a 
-                    href={post.source_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                <div className="mt-auto">
+                  <button 
+                    onClick={() => onReadPost(post)}
                     className="inline-flex items-center font-mono text-sm font-semibold text-zinc-900 hover:text-electric transition-colors uppercase tracking-wider"
                   >
                     Read Full Report 
                     <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                  </a>
-                )}
+                  </button>
+                </div>
               </motion.article>
             ))}
           </div>
@@ -170,6 +173,55 @@ function HomePage() {
           <span className="text-zinc-400 font-mono text-xs uppercase tracking-widest text-center px-4">Advertisement<br/>300x600</span>
         </div>
       </aside>
+    </main>
+  );
+}
+
+function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
+  return (
+    <main className="max-w-4xl mx-auto px-6 py-12">
+      <button onClick={onBack} className="mb-8 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-electric transition-colors flex items-center">
+        &larr; Back to Intel
+      </button>
+      
+      <article>
+        <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tighter text-zinc-900 mb-6 leading-tight">
+          {post.title}
+        </h1>
+        
+        <div className="flex items-center gap-4 mb-8 font-mono text-xs uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-8">
+          <span>{new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</span>
+          <span className="w-8 h-[1px] bg-zinc-300"></span>
+          <span className="text-electric">{post.is_manual ? 'Editorial' : 'Network'}</span>
+        </div>
+        
+        {post.image_url && (
+          <div className="mb-12 bg-zinc-100 aspect-[21/9] overflow-hidden border border-zinc-200">
+            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+          </div>
+        )}
+        
+        {/* Ad Placeholder - Mid Article */}
+        <div className="w-full h-[250px] bg-zinc-50 border border-zinc-200 ad-placeholder flex items-center justify-center mb-12">
+          <div className="text-center">
+            <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest block mb-2">Advertisement Space</span>
+            <span className="font-display text-sm text-zinc-500">728 x 90 / 300 x 250</span>
+          </div>
+        </div>
+
+        <div 
+          className="article-content text-lg leading-relaxed text-zinc-800"
+          dangerouslySetInnerHTML={{ __html: post.content || post.description }}
+        />
+        
+        {post.source_link && (
+          <div className="mt-12 pt-8 border-t border-zinc-200">
+            <a href={post.source_link} target="_blank" rel="noopener noreferrer" className="font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-electric transition-colors">
+              View Original Source &nearr;
+            </a>
+          </div>
+        )}
+      </article>
     </main>
   );
 }
@@ -222,6 +274,7 @@ function AdminDashboard() {
   const [posts, setPosts] = useState<any[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [sourceLink, setSourceLink] = useState('');
   const [loading, setLoading] = useState(false);
@@ -258,11 +311,12 @@ function AdminDashboard() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.from('posts').insert([
-      { title, description, image_url: imageUrl, source_link: sourceLink, is_manual: true }
+      { title, description, content, image_url: imageUrl, source_link: sourceLink, is_manual: true }
     ]);
     if (!error) {
       setTitle('');
       setDescription('');
+      setContent('');
       setImageUrl('');
       setSourceLink('');
       fetchPosts();
@@ -292,8 +346,12 @@ function AdminDashboard() {
               <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full border-b border-zinc-300 py-2 focus:border-electric outline-none transition-colors bg-transparent" required />
             </div>
             <div>
-              <label className="block font-mono text-xs uppercase tracking-widest text-zinc-500 mb-2">Briefing</label>
+              <label className="block font-mono text-xs uppercase tracking-widest text-zinc-500 mb-2">Briefing (Short)</label>
               <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border-b border-zinc-300 py-2 focus:border-electric outline-none transition-colors bg-transparent h-24 resize-none" required></textarea>
+            </div>
+            <div>
+              <label className="block font-mono text-xs uppercase tracking-widest text-zinc-500 mb-2">Full Content (HTML allowed)</label>
+              <textarea value={content} onChange={e => setContent(e.target.value)} className="w-full border-b border-zinc-300 py-2 focus:border-electric outline-none transition-colors bg-transparent h-48 resize-none"></textarea>
             </div>
             <div>
               <label className="block font-mono text-xs uppercase tracking-widest text-zinc-500 mb-2">Asset URL (Image)</label>

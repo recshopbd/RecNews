@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
+import * as cheerio from 'cheerio';
 
 const app = express();
 const PORT = 3000;
@@ -42,12 +43,38 @@ async function fetchGamingNews() {
         }
 
         if (!existing || existing.length === 0) {
-          // Extract image from description if thumbnail is missing
-          const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
-          const imageUrl = item.thumbnail || (imgMatch ? imgMatch[1] : '');
-
-          // Clean HTML tags from description
+          // Clean HTML tags from description for the summary
           const cleanDesc = item.description.replace(/<[^>]*>?/gm, '').substring(0, 250) + '...';
+          
+          let imageUrl = item.thumbnail || '';
+          let fullContent = item.content || item.description;
+
+          // Try to scrape the actual article for the high-res image and full content
+          try {
+            console.log(`Scraping full article: ${item.link}`);
+            const pageRes = await fetch(item.link);
+            const pageHtml = await pageRes.text();
+            const $ = cheerio.load(pageHtml);
+            
+            // Get the main og:image
+            const ogImage = $('meta[property="og:image"]').attr('content');
+            if (ogImage) {
+              imageUrl = ogImage;
+            }
+
+            // Get the actual article content (Polygon uses .c-entry-content or <article>)
+            const articleBody = $('.c-entry-content').html() || $('article').html();
+            if (articleBody) {
+              fullContent = articleBody;
+            }
+          } catch (scrapeError) {
+            console.error(`Failed to scrape ${item.link}, falling back to RSS content.`);
+            // Fallback to regex if scrape fails
+            if (!imageUrl) {
+              const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+              imageUrl = imgMatch ? imgMatch[1] : '';
+            }
+          }
 
           // Format date safely for Postgres
           let safeDate = new Date().toISOString();
@@ -62,6 +89,7 @@ async function fetchGamingNews() {
           const { error: insertError } = await supabase.from('posts').insert({
             title: item.title,
             description: cleanDesc,
+            content: fullContent,
             image_url: imageUrl,
             source_link: item.link,
             published_at: safeDate,
