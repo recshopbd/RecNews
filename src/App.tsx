@@ -28,8 +28,15 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen font-sans selection:bg-electric selection:text-white">
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-zinc-200 transition-all">
+    <div className="min-h-screen font-sans selection:bg-electric selection:text-white relative">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-[#FAFAFA]">
+        <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+        <div className="absolute top-[20%] right-[-10%] w-96 h-96 bg-purple-400/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-emerald-400/10 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-200 transition-all">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
           <motion.h1 
             initial={{ opacity: 0, x: -20 }}
@@ -126,13 +133,27 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
         ) : (
           <div className="space-y-16">
             {posts.map((post, index) => (
-              <motion.article 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                key={post.id} 
-                className="group block border-b border-zinc-200 pb-16 last:border-0"
-              >
+              <React.Fragment key={post.id}>
+                {/* In-feed Ad every 3 posts */}
+                {index > 0 && index % 3 === 0 && (
+                  <div className="mb-16 py-8 border-y border-zinc-200/50 bg-white/50 backdrop-blur-sm flex justify-center">
+                    <div className="text-center w-full flex flex-col items-center">
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-2 block">Advertisement</span>
+                      {index % 2 === 0 ? (
+                        <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
+                      ) : (
+                        <AdsterraAd width={300} height={250} adKey="10a6f13b696d69be3dfebfa7a1083178" />
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <motion.article 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="group block border-b border-zinc-200 pb-16 last:border-0"
+                >
                 {post.image_url && (
                   <div className="overflow-hidden mb-6 bg-zinc-100 aspect-[16/9]">
                     <img 
@@ -164,14 +185,26 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                   </button>
                 </div>
               </motion.article>
+              </React.Fragment>
             ))}
+          </div>
+        )}
+        
+        {/* Bottom of Feed Ad */}
+        {!loading && posts.length > 0 && (
+          <div className="mt-16 pt-8 border-t border-zinc-200 flex justify-center">
+            <div className="text-center flex flex-col items-center">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-2 block">Advertisement</span>
+              <AdsterraAd width={468} height={60} adKey="b61929ab325631dd0961c6f10d44d567" />
+            </div>
           </div>
         )}
       </div>
       
       <aside className="lg:col-span-4 space-y-8">
-        <div className="sticky top-28">
+        <div className="sticky top-28 space-y-8 flex flex-col items-center">
           <AdsterraAd width={160} height={300} adKey="283714653157f63c704355a2865c8c15" />
+          <AdsterraAd width={160} height={600} adKey="3645f0ba679988b5553cabdb8721b40a" />
         </div>
       </aside>
     </main>
@@ -180,45 +213,74 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
 
 function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
   return (
-    <main className="max-w-4xl mx-auto px-6 py-12">
-      <button onClick={onBack} className="mb-8 font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-electric transition-colors flex items-center">
-        &larr; Back to Intel
-      </button>
-      
-      <article>
-        <h1 className="text-4xl md:text-5xl font-display font-bold tracking-tighter text-zinc-900 mb-6 leading-tight">
-          {post.title}
-        </h1>
-        
-        <div className="flex items-center gap-4 mb-8 font-mono text-xs uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-8">
-          <span>{new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</span>
-          <span className="w-8 h-[1px] bg-zinc-300"></span>
-          <span className="text-electric">{post.is_manual ? 'Editorial' : 'Network'}</span>
+    <main className="min-h-screen bg-white pb-24">
+      {/* Top Navigation Bar for Post */}
+      <div className="sticky top-20 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-200 px-6 py-4 flex items-center justify-between">
+        <button onClick={onBack} className="font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-electric transition-colors flex items-center group">
+          <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back to Intel
+        </button>
+        <div className="flex items-center gap-2">
+          <span className={`w-2 h-2 rounded-full ${post.is_manual ? 'bg-electric' : 'bg-zinc-300'}`}></span>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400">
+            {post.is_manual ? 'Editorial' : 'Network'}
+          </span>
         </div>
+      </div>
+      
+      <article className="max-w-5xl mx-auto px-6 pt-12">
+        <header className="max-w-3xl mx-auto text-center mb-12">
+          <div className="flex items-center justify-center gap-4 mb-6 font-mono text-xs uppercase tracking-widest text-zinc-500">
+            <span>{new Date(post.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-display font-bold tracking-tighter text-zinc-900 mb-8 leading-[1.1]">
+            {post.title}
+          </h1>
+          {post.description && post.description !== post.content && (
+            <p className="text-xl md:text-2xl text-zinc-500 leading-relaxed font-light mb-8">
+              {post.description}
+            </p>
+          )}
+          
+          {/* Top Article Mobile/Small Ad */}
+          <div className="flex justify-center mt-8">
+            <AdsterraAd width={320} height={50} adKey="31388411e62914149bf655e47998fcca" />
+          </div>
+        </header>
         
         {post.image_url && (
-          <div className="mb-12 bg-zinc-100 aspect-[21/9] overflow-hidden border border-zinc-200">
+          <div className="mb-16 w-full aspect-[21/9] md:aspect-[2.5/1] overflow-hidden bg-zinc-100 rounded-sm">
             <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
           </div>
         )}
         
-        {/* Ad Placeholder - Mid Article */}
-        <div className="mb-12">
-          <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
-        </div>
-
-        <div 
-          className="article-content text-lg leading-relaxed text-zinc-800"
-          dangerouslySetInnerHTML={{ __html: post.content || post.description }}
-        />
-        
-        {post.source_link && (
-          <div className="mt-12 pt-8 border-t border-zinc-200">
-            <a href={post.source_link} target="_blank" rel="noopener noreferrer" className="font-mono text-xs uppercase tracking-widest text-zinc-500 hover:text-electric transition-colors">
-              View Original Source &nearr;
-            </a>
+        <div className="max-w-3xl mx-auto">
+          {/* Ad Placeholder - Top Article */}
+          <div className="mb-12 flex justify-center">
+            <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
           </div>
-        )}
+
+          <div 
+            className="article-content"
+            dangerouslySetInnerHTML={{ __html: post.content || post.description }}
+          />
+          
+          {/* Bottom of Article Ad */}
+          <div className="mt-16 pt-12 border-t border-zinc-200 flex flex-col items-center justify-center">
+            <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-400 mb-4 block">Advertisement</span>
+            <AdsterraAd width={300} height={250} adKey="10a6f13b696d69be3dfebfa7a1083178" />
+          </div>
+
+          {post.source_link && (
+            <div className="mt-16 pt-8 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">End of Report</span>
+              <a href={post.source_link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 bg-zinc-900 text-white font-mono text-xs uppercase tracking-widest hover:bg-electric transition-colors">
+                View Original Source
+                <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+            </div>
+          )}
+        </div>
       </article>
     </main>
   );
