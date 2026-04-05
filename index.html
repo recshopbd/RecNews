@@ -6,15 +6,55 @@
     <meta name="description" content="RecNews delivers the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content." />
     <meta name="theme-color" content="#121212" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://news.recshopbd.com/" />
+    <meta property="og:title" content="RecNews - Latest Gaming Intel" />
+    <meta property="og:description" content="RecNews delivers the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content." />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://news.recshopbd.com/" />
+    <meta property="twitter:title" content="RecNews - Latest Gaming Intel" />
+    <meta property="twitter:description" content="RecNews delivers the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content." />
+
     <link rel="canonical" href="https://news.recshopbd.com/" />
     <link rel="apple-touch-icon" href="/vite.svg" />
+    
+    <!-- Preconnects for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://pl29071490.profitablecpmratenetwork.com" crossorigin />
     <link rel="preconnect" href="https://pl29071802.profitablecpmratenetwork.com" crossorigin />
     <link rel="preconnect" href="https://ueyggkgbdedfjvreqkmm.supabase.co" crossorigin />
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    
     <title>RecNews - Latest Gaming Intel</title>
+    <style>
+      /* Inline critical CSS for initial paint */
+      body { margin: 0; background-color: #0F172A; color: #E5E7EB; font-family: system-ui, sans-serif; }
+      #initial-loader { display: flex; flex-direction: column; min-height: 100vh; }
+      .nav-skeleton { height: 80px; border-bottom: 1px solid rgba(126, 34, 206, 0.3); display: flex; align-items: center; padding: 0 24px; }
+      .nav-brand { width: 120px; height: 36px; background: rgba(0, 255, 255, 0.1); border-radius: 4px; }
+      .content-skeleton { max-width: 80rem; margin: 0 auto; padding: 48px 24px; width: 100%; box-sizing: border-box; }
+      .title-skeleton { width: 200px; height: 48px; background: rgba(255, 255, 255, 0.05); margin-bottom: 32px; border-radius: 4px; }
+      .card-skeleton { height: 300px; background: rgba(19, 28, 49, 0.8); border: 1px solid rgba(126, 34, 206, 0.3); border-radius: 12px; margin-bottom: 48px; }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="initial-loader">
+        <div class="nav-skeleton"><div class="nav-brand"></div></div>
+        <div class="content-skeleton">
+          <div class="title-skeleton"></div>
+          <div class="card-skeleton"></div>
+          <div class="card-skeleton"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -210,6 +210,8 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                       loading={index === 0 ? "eager" : "lazy"}
                       fetchPriority={index === 0 ? "high" : "auto"}
                       decoding="async"
+                      width="800"
+                      height="450"
                     />
                   </div>
                 )}
@@ -325,7 +327,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
         
         {post.image_url && (
           <div className="mb-16 w-full aspect-[21/9] md:aspect-[2.5/1] overflow-hidden bg-gray-800 rounded border border-cyber-purple/30 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" fetchPriority="high" loading="eager" decoding="async" />
+            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" fetchPriority="high" loading="eager" decoding="async" width="1200" height="480" />
           </div>
         )}
         
