@@ -26,6 +26,7 @@ export default function AdsterraNativeAd() {
         style={{ height: '250px', border: 'none', overflow: 'hidden' }}
         srcDoc={adHtml}
         scrolling="no"
+        loading="lazy"
       />
     </div>
   );

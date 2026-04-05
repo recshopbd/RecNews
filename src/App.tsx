@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
 import AdsterraAd from './components/AdsterraAd';
 import AdsterraNativeAd from './components/AdsterraNativeAd';
 
@@ -43,6 +44,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen font-sans selection:bg-cyber-cyan selection:text-cyber-bg relative text-gray-100">
+      <Helmet>
+        <title>RecNews - Latest Gaming Intel</title>
+        <meta name="description" content="RecNews delivers the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content." />
+      </Helmet>
+
       {/* Animated Background Elements */}
       <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-cyber-bg">
         <div className="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-cyber-cyan/5 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-blob"></div>
@@ -69,10 +75,10 @@ export default function App() {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path></svg>
               Hot Offer
             </a>
-            <button onClick={() => { setView('home'); setSelectedPost(null); }} className={`transition-all duration-300 ${view === 'home' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Home</button>
-            <button onClick={() => setView('admin')} className={`transition-all duration-300 ${view === 'admin' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Admin</button>
+            <button aria-label="Go to Home" onClick={() => { setView('home'); setSelectedPost(null); }} className={`transition-all duration-300 ${view === 'home' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Home</button>
+            <button aria-label="Go to Admin" onClick={() => setView('admin')} className={`transition-all duration-300 ${view === 'admin' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Admin</button>
             {session && (
-              <button onClick={() => supabase.auth.signOut()} className="text-red-400 hover:text-red-300 hover:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] transition-all">Sign Out</button>
+              <button aria-label="Sign Out" onClick={() => supabase.auth.signOut()} className="text-red-400 hover:text-red-300 hover:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] transition-all">Sign Out</button>
             )}
           </motion.div>
         </div>
@@ -195,6 +201,8 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                       alt={post.title} 
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
                       referrerPolicy="no-referrer" 
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 )}
@@ -211,6 +219,7 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                 </p>
                 <div className="mt-auto">
                   <button 
+                    aria-label={`Read full report: ${post.title}`}
                     onClick={() => {
                       // Guaranteed Popup using Direct Link
                       window.open('https://www.profitablecpmratenetwork.com/ezcmnsa3nz?key=cf9a2d1507c74957cdb48f305fc2f26f', '_blank');
@@ -265,9 +274,17 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
 function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
   return (
     <main className="min-h-screen bg-cyber-bg pb-24 text-gray-100">
+      <Helmet>
+        <title>{post.title} | RecNews</title>
+        <meta name="description" content={post.description || post.title} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.description || post.title} />
+        {post.image_url && <meta property="og:image" content={post.image_url} />}
+      </Helmet>
+
       {/* Top Navigation Bar for Post */}
       <div className="sticky top-20 z-40 bg-cyber-bg/90 backdrop-blur-md border-b border-cyber-purple/30 px-6 py-4 flex items-center justify-between shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
-        <button onClick={onBack} className="font-mono text-xs uppercase tracking-widest text-gray-400 hover:text-cyber-cyan transition-colors flex items-center group">
+        <button aria-label="Back to Intel" onClick={onBack} className="font-mono text-xs uppercase tracking-widest text-gray-400 hover:text-cyber-cyan transition-colors flex items-center group">
           <svg className="w-4 h-4 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
           Back to Intel
         </button>
@@ -301,7 +318,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
         
         {post.image_url && (
           <div className="mb-16 w-full aspect-[21/9] md:aspect-[2.5/1] overflow-hidden bg-gray-800 rounded border border-cyber-purple/30 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" fetchPriority="high" decoding="async" />
           </div>
         )}
         
@@ -357,6 +374,10 @@ function AdminPanel({ session }: { session: any }) {
   if (!session) {
     return (
       <main className="max-w-md mx-auto px-6 py-24">
+        <Helmet>
+          <title>System Access | RecNews Admin</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Helmet>
         <div className="bg-gray-900/50 p-10 border border-cyber-purple/30 rounded-xl shadow-[0_0_20px_rgba(126,34,206,0.1)]">
           <div className="mb-8 border-b border-cyber-purple/50 pb-4">
             <h2 className="text-3xl font-display font-bold tracking-wider text-white uppercase">System Access</h2>
@@ -448,6 +469,10 @@ function AdminDashboard() {
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <Helmet>
+        <title>Admin Dashboard | RecNews</title>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="lg:col-span-4">
         <div className="bg-gray-900/50 p-8 border border-cyber-purple/30 rounded-xl sticky top-28 shadow-[0_0_20px_rgba(126,34,206,0.1)]">
           <div className="border-b border-cyber-purple/50 pb-4 mb-8">

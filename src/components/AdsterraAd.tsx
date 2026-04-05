@@ -68,6 +68,7 @@ export default function AdsterraAd({ width, height, adKey }: AdsterraAdProps) {
         srcDoc={adHtml}
         frameBorder="0"
         scrolling="no"
+        loading="lazy"
         style={{ 
           border: 'none', 
           overflow: 'hidden', 
