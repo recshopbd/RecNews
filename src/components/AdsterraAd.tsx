@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 interface AdsterraAdProps {
   width: number;
@@ -7,56 +7,74 @@ interface AdsterraAdProps {
 }
 
 export default function AdsterraAd({ width, height, adKey }: AdsterraAdProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    // Clear any existing ad scripts to prevent duplicates on re-render
-    containerRef.current.innerHTML = '';
-
-    // If it's a placeholder key, show a visual placeholder instead of loading the script
-    if (adKey.includes('YOUR_')) {
-      containerRef.current.innerHTML = `
-        <div class="w-full h-full flex flex-col items-center justify-center text-zinc-400 font-mono text-xs text-center p-4">
-          <span class="text-electric mb-1">Adsterra Ad Space</span>
-          <span>${width}x${height}</span>
-          <span class="mt-2 text-[10px] opacity-70">Replace '${adKey}' in code</span>
+  // If it's a placeholder key, show a visual placeholder instead of loading the script
+  if (adKey.includes('YOUR_')) {
+    return (
+      <div className="flex justify-center items-center w-full">
+        <div 
+          className="bg-zinc-50 border border-zinc-200 border-dashed flex flex-col items-center justify-center text-zinc-400 font-mono text-xs text-center p-4"
+          style={{ width: width, height: height }}
+        >
+          <span className="text-electric mb-1">Adsterra Ad Space</span>
+          <span>{width}x{height}</span>
+          <span className="mt-2 text-[10px] opacity-70">Replace '{adKey}' in code</span>
         </div>
-      `;
-      return;
-    }
+      </div>
+    );
+  }
 
-    // 1. Create the configuration script
-    const confScript = document.createElement('script');
-    confScript.type = 'text/javascript';
-    confScript.innerHTML = `
-      atOptions = {
-        'key' : '${adKey}',
-        'format' : 'iframe',
-        'height' : ${height},
-        'width' : ${width},
-        'params' : {}
-      };
-    `;
-
-    // 2. Create the invoke script
-    const invokeScript = document.createElement('script');
-    invokeScript.type = 'text/javascript';
-    // Note: Adsterra domains can vary. If your snippet uses a different domain, update it here.
-    invokeScript.src = `//www.highperformanceformat.com/${adKey}/invoke.js`;
-
-    // 3. Append to the container
-    containerRef.current.appendChild(confScript);
-    containerRef.current.appendChild(invokeScript);
-  }, [adKey, width, height]);
+  // Adsterra uses a global `atOptions` variable. In a React Single Page Application,
+  // multiple ad components rendering at the same time will overwrite each other's 
+  // global `atOptions`, causing only one ad (or none) to load correctly.
+  // By wrapping the ad script in an iframe using srcDoc, we give each ad its own 
+  // isolated window environment, preventing variable collisions.
+  const adHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: transparent; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+          }
+        </style>
+      </head>
+      <body>
+        <script type="text/javascript">
+          var atOptions = {
+            'key' : '${adKey}',
+            'format' : 'iframe',
+            'height' : ${height},
+            'width' : ${width},
+            'params' : {}
+          };
+        </script>
+        <script type="text/javascript" src="https://www.highperformanceformat.com/${adKey}/invoke.js"></script>
+      </body>
+    </html>
+  `;
 
   return (
-    <div className="flex justify-center items-center w-full">
-      <div 
-        ref={containerRef} 
-        className="bg-zinc-50 border border-zinc-200 border-dashed overflow-hidden flex items-center justify-center"
-        style={{ width: width, height: height }}
+    <div className="flex justify-center items-center w-full overflow-hidden">
+      <iframe
+        title={`Adsterra ${width}x${height}`}
+        width={width}
+        height={height}
+        srcDoc={adHtml}
+        frameBorder="0"
+        scrolling="no"
+        style={{ 
+          border: 'none', 
+          overflow: 'hidden', 
+          width: `${width}px`, 
+          height: `${height}px`,
+          backgroundColor: 'transparent'
+        }}
       />
     </div>
   );
