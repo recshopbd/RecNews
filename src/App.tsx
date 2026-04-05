@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
@@ -11,9 +12,10 @@ import AdsterraAd from './components/AdsterraAd';
 import AdsterraNativeAd from './components/AdsterraNativeAd';
 
 export default function App() {
-  const [view, setView] = useState('home'); // 'home' | 'admin'
   const [session, setSession] = useState<any>(null);
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -64,14 +66,13 @@ export default function App() {
 
       <nav className="sticky top-0 z-50 bg-cyber-bg/80 backdrop-blur-xl border-b border-cyber-purple/30 transition-all shadow-[0_4px_30px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <motion.h1 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+          <Link 
+            to="/"
             className="text-3xl font-display font-bold tracking-wider cursor-pointer text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" 
-            onClick={() => { setView('home'); setSelectedPost(null); }}
+            onClick={() => setSelectedPost(null)}
           >
             REC<span className="text-cyber-cyan drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">NEWS</span>
-          </motion.h1>
+          </Link>
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -81,8 +82,7 @@ export default function App() {
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path></svg>
               Hot Offer
             </a>
-            <button aria-label="Go to Home" onClick={() => { setView('home'); setSelectedPost(null); }} className={`transition-all duration-300 ${view === 'home' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Home</button>
-            <button aria-label="Go to Admin" onClick={() => setView('admin')} className={`transition-all duration-300 ${view === 'admin' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Admin</button>
+            <Link to="/" onClick={() => setSelectedPost(null)} className={`transition-all duration-300 ${location.pathname === '/' ? 'text-cyber-cyan font-bold drop-shadow-[0_0_8px_rgba(0,255,255,0.5)]' : 'text-gray-400 hover:text-white'}`}>Home</Link>
             {session && (
               <button aria-label="Sign Out" onClick={() => supabase.auth.signOut()} className="text-red-400 hover:text-red-300 hover:drop-shadow-[0_0_8px_rgba(248,113,113,0.5)] transition-all">Sign Out</button>
             )}
@@ -91,19 +91,25 @@ export default function App() {
       </nav>
 
       <AnimatePresence mode="wait">
-        {view === 'home' && !selectedPost ? (
-          <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-            <HomePage onReadPost={setSelectedPost} />
-          </motion.div>
-        ) : view === 'home' && selectedPost ? (
-          <motion.div key="post" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-            <PostPage post={selectedPost} onBack={() => setSelectedPost(null)} />
-          </motion.div>
-        ) : (
-          <motion.div key="admin" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-            <AdminPanel session={session} />
-          </motion.div>
-        )}
+        {/* @ts-ignore - key is needed for AnimatePresence but not in RoutesProps */}
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={
+            !selectedPost ? (
+              <motion.div key="home" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                <HomePage onReadPost={setSelectedPost} />
+              </motion.div>
+            ) : (
+              <motion.div key="post" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                <PostPage post={selectedPost} onBack={() => setSelectedPost(null)} />
+              </motion.div>
+            )
+          } />
+          <Route path="/admin" element={
+            <motion.div key="admin" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+              <AdminPanel session={session} />
+            </motion.div>
+          } />
+        </Routes>
       </AnimatePresence>
     </div>
   );

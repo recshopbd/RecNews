@@ -24,7 +24,7 @@ export default defineConfig(({mode}) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ['react', 'react-dom', 'react-helmet-async'],
+            vendor: ['react', 'react-dom', 'react-helmet-async', 'react-router-dom'],
             motion: ['motion/react'],
             supabase: ['@supabase/supabase-js']
           }
