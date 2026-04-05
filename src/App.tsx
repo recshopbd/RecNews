@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
+import AdsterraAd from './components/AdsterraAd';
 
 export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'admin'
@@ -98,8 +99,8 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
   return (
     <main className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-12">
       {/* Header Ad */}
-      <div className="lg:col-span-12 h-24 bg-zinc-50 border border-zinc-200 border-dashed ad-placeholder flex items-center justify-center mb-4">
-        <span className="text-zinc-400 font-mono text-xs uppercase tracking-widest">Advertisement / 728x90</span>
+      <div className="lg:col-span-12 mb-4">
+        <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
       </div>
 
       <div className="lg:col-span-8 space-y-12">
@@ -169,8 +170,8 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
       </div>
       
       <aside className="lg:col-span-4 space-y-8">
-        <div className="h-[600px] bg-zinc-50 border border-zinc-200 border-dashed ad-placeholder flex items-center justify-center sticky top-28">
-          <span className="text-zinc-400 font-mono text-xs uppercase tracking-widest text-center px-4">Advertisement<br/>300x600</span>
+        <div className="sticky top-28">
+          <AdsterraAd width={160} height={300} adKey="283714653157f63c704355a2865c8c15" />
         </div>
       </aside>
     </main>
@@ -202,11 +203,8 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
         )}
         
         {/* Ad Placeholder - Mid Article */}
-        <div className="w-full h-[250px] bg-zinc-50 border border-zinc-200 ad-placeholder flex items-center justify-center mb-12">
-          <div className="text-center">
-            <span className="font-mono text-xs text-zinc-400 uppercase tracking-widest block mb-2">Advertisement Space</span>
-            <span className="font-display text-sm text-zinc-500">728 x 90 / 300 x 250</span>
-          </div>
+        <div className="mb-12">
+          <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
         </div>
 
         <div 
