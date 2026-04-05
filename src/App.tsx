@@ -51,7 +51,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen font-sans selection:bg-cyber-cyan selection:text-cyber-bg relative text-gray-100">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-cyber-cyan selection:text-cyber-bg relative text-gray-100">
       <Helmet>
         <title>RecNews - Latest Gaming Intel</title>
         <meta name="description" content="RecNews delivers the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content." />
@@ -111,6 +111,65 @@ export default function App() {
           } />
         </Routes>
       </AnimatePresence>
+
+      {/* Global Footer */}
+      <footer className="mt-auto border-t border-cyber-purple/30 bg-cyber-bg/90 backdrop-blur-md relative z-40">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Brand & About */}
+            <div className="space-y-4">
+              <Link to="/" className="text-2xl font-display font-bold tracking-wider cursor-pointer text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" onClick={() => setSelectedPost(null)}>
+                REC<span className="text-cyber-cyan drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">NEWS</span>
+              </Link>
+              <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+                Delivering the latest gaming intel, esports news, and cyberpunk luxury gaming lifestyle content.
+              </p>
+              <div className="pt-2">
+                <span className="font-mono text-xs uppercase tracking-widest text-gray-500">A Product of </span>
+                <span className="font-display font-bold text-cyber-purple tracking-wider text-lg drop-shadow-[0_0_5px_rgba(126,34,206,0.5)]">RecNest</span>
+              </div>
+            </div>
+
+            {/* Ecosystem Links */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-gray-300 font-bold">Ecosystem</h4>
+              <ul className="space-y-3 font-mono text-sm">
+                <li>
+                  <a href="https://recshopbd.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-cyber-cyan transition-colors flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    RecShopBD.com
+                  </a>
+                </li>
+                <li>
+                  <Link to="/" onClick={() => setSelectedPost(null)} className="text-gray-400 hover:text-cyber-cyan transition-colors flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5L18.5 8H20"></path></svg>
+                    Latest Intel
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal & Contact */}
+            <div className="space-y-4">
+              <h4 className="font-mono text-xs uppercase tracking-widest text-gray-300 font-bold">Legal & Info</h4>
+              <ul className="space-y-3 font-mono text-sm">
+                <li><a href="#" className="text-gray-400 hover:text-cyber-cyan transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-cyber-cyan transition-colors">Terms of Service</a></li>
+                <li><a href="mailto:contact@recshopbd.com" className="text-gray-400 hover:text-cyber-cyan transition-colors">Contact Us</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-12 pt-8 border-t border-cyber-purple/20 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="font-mono text-xs text-gray-500 uppercase tracking-widest text-center md:text-left">
+              &copy; {new Date().getFullYear()} RecNews. All rights reserved.
+            </p>
+            <p className="font-mono text-[10px] text-gray-600 uppercase tracking-widest text-center md:text-right max-w-md">
+              Not affiliated with game developers or publishers unless explicitly stated. Trademarks belong to their respective owners.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
