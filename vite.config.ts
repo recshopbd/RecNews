@@ -20,5 +20,16 @@ export default defineConfig(({mode}) => {
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-helmet-async'],
+            motion: ['motion/react'],
+            supabase: ['@supabase/supabase-js']
+          }
+        }
+      }
+    }
   };
 });

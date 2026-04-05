@@ -27,19 +27,25 @@ export default function App() {
     });
 
     // Inject Adsterra Global Scripts dynamically for React SPA compatibility
-    const globalScripts = [
-      'https://pl29071490.profitablecpmratenetwork.com/dd/ae/78/ddae78d7b325db03dc8df004d486c6b1.js',
-      'https://pl29071802.profitablecpmratenetwork.com/90/6b/40/906b403c5741e514a48da7d6ce4bbf4d.js'
-    ];
-    
-    globalScripts.forEach(src => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = true;
-      document.body.appendChild(script);
-    });
+    // Delay injection to prioritize main content rendering (improves LCP/FCP on mobile)
+    const timer = setTimeout(() => {
+      const globalScripts = [
+        'https://pl29071490.profitablecpmratenetwork.com/dd/ae/78/ddae78d7b325db03dc8df004d486c6b1.js',
+        'https://pl29071802.profitablecpmratenetwork.com/90/6b/40/906b403c5741e514a48da7d6ce4bbf4d.js'
+      ];
+      
+      globalScripts.forEach(src => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        document.body.appendChild(script);
+      });
+    }, 2500);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
@@ -163,7 +169,7 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                 {index > 0 && index % 3 === 0 && (
                   <div className="mb-12 py-8 border-y border-cyber-purple/30 bg-gray-900/30 backdrop-blur-sm flex justify-center rounded-lg">
                     <div className="text-center w-full flex flex-col items-center">
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2 block">Advertisement</span>
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-2 block">Advertisement</span>
                       {index % 2 === 0 ? (
                         <AdsterraAd width={728} height={90} adKey="1cb5c203f82843b157536abb5634f51f" />
                       ) : (
@@ -201,7 +207,8 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                       alt={post.title} 
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" 
                       referrerPolicy="no-referrer" 
-                      loading="lazy"
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
                       decoding="async"
                     />
                   </div>
@@ -241,7 +248,7 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
         {!loading && posts.length > 0 && (
           <div className="mt-16 pt-8 border-t border-cyber-purple/30 flex justify-center">
             <div className="text-center flex flex-col items-center">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2 block">Advertisement</span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-2 block">Advertisement</span>
               <AdsterraAd width={468} height={60} adKey="b61929ab325631dd0961c6f10d44d567" />
             </div>
           </div>
@@ -289,7 +296,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
           Back to Intel
         </button>
         <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${post.is_manual ? 'bg-cyber-cyan text-cyber-cyan' : 'bg-gray-500 text-gray-500'}`}></span>
+          <span className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${post.is_manual ? 'bg-cyber-cyan text-cyber-cyan' : 'bg-gray-400 text-gray-400'}`}></span>
           <span className="font-mono text-[10px] uppercase tracking-widest text-gray-400">
             {post.is_manual ? 'Editorial' : 'Network'}
           </span>
@@ -318,7 +325,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
         
         {post.image_url && (
           <div className="mb-16 w-full aspect-[21/9] md:aspect-[2.5/1] overflow-hidden bg-gray-800 rounded border border-cyber-purple/30 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" fetchPriority="high" decoding="async" />
+            <img src={post.image_url} alt={post.title} className="w-full h-full object-cover" referrerPolicy="no-referrer" fetchPriority="high" loading="eager" decoding="async" />
           </div>
         )}
         
@@ -335,7 +342,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
           
           {/* Bottom of Article Ad */}
           <div className="mt-16 pt-12 border-t border-cyber-purple/30 flex flex-col items-center justify-center">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-gray-500 mb-4 block">Advertisement</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-gray-400 mb-4 block">Advertisement</span>
             <div className="border border-cyber-purple/30 p-4 bg-gray-900/50 rounded">
               <AdsterraAd width={300} height={250} adKey="10a6f13b696d69be3dfebfa7a1083178" />
             </div>
@@ -343,7 +350,7 @@ function PostPage({ post, onBack }: { post: any, onBack: () => void }) {
 
           {post.source_link && (
             <div className="mt-16 pt-8 border-t border-cyber-purple/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <span className="font-mono text-xs uppercase tracking-widest text-gray-500">End of Report</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-gray-400">End of Report</span>
               <a href={post.source_link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-6 py-3 bg-cyber-cyan text-cyber-bg font-bold font-mono text-xs uppercase tracking-widest hover:bg-white hover:shadow-[0_0_15px_rgba(0,255,255,0.6)] transition-all rounded">
                 View Original Source
                 <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
@@ -517,7 +524,7 @@ function AdminDashboard() {
             >
               {syncing ? 'Syncing...' : 'Sync Latest News'}
             </button>
-            <span className="font-mono text-xs text-gray-500 uppercase tracking-widest">{posts.length} Entries</span>
+            <span className="font-mono text-xs text-gray-400 uppercase tracking-widest">{posts.length} Entries</span>
           </div>
         </div>
         
@@ -531,13 +538,13 @@ function AdminDashboard() {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <span className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${post.is_manual ? 'bg-cyber-cyan text-cyber-cyan' : 'bg-gray-500 text-gray-500'}`}></span>
+                  <span className={`w-2 h-2 rounded-full shadow-[0_0_5px_currentColor] ${post.is_manual ? 'bg-cyber-cyan text-cyber-cyan' : 'bg-gray-400 text-gray-400'}`}></span>
                   <span className="font-mono text-xs uppercase tracking-widest text-gray-400">
                     {post.is_manual ? 'Editorial' : 'Automated'}
                   </span>
                 </div>
                 <h4 className="font-display font-bold text-lg text-white leading-tight">{post.title}</h4>
-                <p className="text-xs text-gray-500 mt-2 font-mono">
+                <p className="text-xs text-gray-400 mt-2 font-mono">
                   {new Date(post.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
                 </p>
               </div>
@@ -552,7 +559,7 @@ function AdminDashboard() {
           ))}
           {posts.length === 0 && (
             <div className="py-12 text-center border border-cyber-purple/30 border-dashed rounded bg-gray-900/30">
-              <p className="text-gray-500 font-mono text-sm tracking-widest">NO_RECORDS_FOUND</p>
+              <p className="text-gray-400 font-mono text-sm tracking-widest">NO_RECORDS_FOUND</p>
             </div>
           )}
         </div>
