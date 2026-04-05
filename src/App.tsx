@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import AdsterraAd from './components/AdsterraAd';
+import AdsterraNativeAd from './components/AdsterraNativeAd';
 
 export default function App() {
   const [view, setView] = useState('home'); // 'home' | 'admin'
@@ -51,6 +52,10 @@ export default function App() {
             animate={{ opacity: 1, x: 0 }}
             className="flex gap-8 items-center font-mono text-xs uppercase tracking-widest"
           >
+            <a href="https://www.profitablecpmratenetwork.com/ezcmnsa3nz?key=cf9a2d1507c74957cdb48f305fc2f26f" target="_blank" rel="noopener noreferrer" className="text-electric font-bold hover:text-blue-700 transition-colors flex items-center gap-1 bg-blue-50 px-3 py-1.5 rounded-full">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path></svg>
+              Hot Offer
+            </a>
             <button onClick={() => { setView('home'); setSelectedPost(null); }} className={`transition-colors ${view === 'home' ? 'text-electric font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}>Home</button>
             <button onClick={() => setView('admin')} className={`transition-colors ${view === 'admin' ? 'text-electric font-semibold' : 'text-zinc-500 hover:text-zinc-900'}`}>Admin</button>
             {session && (
@@ -147,6 +152,11 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
                     </div>
                   </div>
                 )}
+
+                {/* Native Ad every 5 posts */}
+                {index > 0 && index % 5 === 0 && (
+                  <AdsterraNativeAd />
+                )}
                 
                 <motion.article 
                   initial={{ opacity: 0, y: 20 }}
@@ -203,6 +213,14 @@ function HomePage({ onReadPost }: { onReadPost: (post: any) => void }) {
       
       <aside className="lg:col-span-4 space-y-8">
         <div className="sticky top-28 space-y-8 flex flex-col items-center">
+          {/* Direct Link Banner */}
+          <a href="https://www.profitablecpmratenetwork.com/ezcmnsa3nz?key=cf9a2d1507c74957cdb48f305fc2f26f" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-br from-electric to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all flex flex-col items-center text-center group">
+            <span className="font-mono text-xs uppercase tracking-widest opacity-80 mb-2">Sponsored Partner</span>
+            <h4 className="font-display font-bold text-xl mb-2 group-hover:underline">Claim Your Exclusive Reward</h4>
+            <p className="text-sm opacity-90 mb-4">Click here to view today's special offer.</p>
+            <span className="inline-block bg-white text-electric font-bold px-6 py-2 rounded-full text-sm uppercase tracking-wider">Play Now</span>
+          </a>
+
           <AdsterraAd width={160} height={300} adKey="283714653157f63c704355a2865c8c15" />
           <AdsterraAd width={160} height={600} adKey="3645f0ba679988b5553cabdb8721b40a" />
         </div>
